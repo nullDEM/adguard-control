@@ -1,0 +1,17 @@
+# Xcode
+*.xcodeproj
+xcuserdata/
+DerivedData/
+build/
+*.xcresult
+*.xctestproducts
+*.ipa
+*.dSYM.zip
+
+# macOS
+.DS_Store
+
+# Local secrets and environment files (never commit credentials)
+.env
+*.p12
+*.mobileprovision
