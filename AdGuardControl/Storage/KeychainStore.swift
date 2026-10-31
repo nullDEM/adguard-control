@@ -6,6 +6,12 @@ protocol PasswordStoring: AnyObject {
     func password(for profileID: UUID) -> String?
     func setPassword(_ password: String, for profileID: UUID) throws
     func deletePassword(for profileID: UUID)
+    /// Przenosi hasła zapisane w starszych wersjach do wspólnej grupy Keychain (tylko prawdziwy Keychain).
+    func migrateToSharedGroup(profileIDs: [UUID])
+}
+
+extension PasswordStoring {
+    func migrateToSharedGroup(profileIDs: [UUID]) {}
 }
 
 enum KeychainError: Error, LocalizedError {
@@ -61,13 +67,44 @@ final class KeychainStore: PasswordStoring {
     }
 
     /// Przenosi hasła zapisane przed dodaniem widgetów do wspólnej grupy Keychain (pierwsza grupa z uprawnień)
-    /// i ustawia dostępność wymaganą przez odświeżanie w tle. Bezpieczne do wielokrotnego wywołania.
+    /// i ustawia dostępność wymaganą przez odświeżanie w tle.
+    /// Najpierw dodaje kopię w nowej grupie i dopiero po sukcesie usuwa starą – hasło nie może zniknąć po drodze.
+    /// Wykonuje się raz (flaga w `defaults`); po błędzie próbuje przy następnym uruchomieniu.
     func migrateToSharedGroup(profileIDs: [UUID]) {
+        migrateToSharedGroup(profileIDs: profileIDs, defaults: SharedStorage.defaults)
+    }
+
+    func migrateToSharedGroup(profileIDs: [UUID], defaults: UserDefaults) {
+        let flag = "keychain.sharedGroupMigrated.\(service)"
+        guard !defaults.bool(forKey: flag) else { return }
+        var allSucceeded = true
         for id in profileIDs {
-            guard let password = password(for: id) else { continue }
-            deletePassword(for: id)
-            try? setPassword(password, for: id)
+            var lookup = query(for: id)
+            lookup[kSecReturnAttributes as String] = true
+            lookup[kSecReturnData as String] = true
+            lookup[kSecMatchLimit as String] = kSecMatchLimitOne
+            var result: AnyObject?
+            guard SecItemCopyMatching(lookup as CFDictionary, &result) == errSecSuccess,
+                  let item = result as? [String: Any],
+                  let data = item[kSecValueData as String] as? Data,
+                  let oldGroup = item[kSecAttrAccessGroup as String] as? String else { continue }
+
+            var add = query(for: id)
+            add[kSecValueData as String] = data
+            add[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            let status = SecItemAdd(add as CFDictionary, nil)
+            switch status {
+            case errSecSuccess:
+                var remove = query(for: id)
+                remove[kSecAttrAccessGroup as String] = oldGroup
+                SecItemDelete(remove as CFDictionary)
+            case errSecDuplicateItem:
+                break   // kopia w docelowej grupie już istnieje – stary wpis zostaje nietknięty
+            default:
+                allSucceeded = false
+            }
         }
+        if allSucceeded { defaults.set(true, forKey: flag) }
     }
 }
 

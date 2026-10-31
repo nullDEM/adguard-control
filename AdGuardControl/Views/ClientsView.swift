@@ -87,7 +87,7 @@ struct ClientsView: View {
         HStack {
             Image(systemName: "laptopcomputer.and.iphone").foregroundStyle(.secondary)
             VStack(alignment: .leading, spacing: 2) {
-                Text(auto.name?.isEmpty == false ? auto.name! : auto.ip).font(.subheadline)
+                Text(auto.name.flatMap { $0.isEmpty ? nil : $0 } ?? auto.ip).font(.subheadline)
                 Text("\(auto.ip)\(auto.source.map { " · \($0)" } ?? "")").font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
@@ -97,7 +97,7 @@ struct ClientsView: View {
         .swipeActions(edge: .leading) {
             Button {
                 var client = Client.new()
-                client.name = auto.name?.isEmpty == false ? auto.name! : auto.ip
+                client.name = auto.name.flatMap { $0.isEmpty ? nil : $0 } ?? auto.ip
                 client.ids = [auto.ip]
                 editing = ClientEditorTarget(client: nil, prefill: client)
             } label: { Label("Zapisz", systemImage: "plus") }.tint(Palette.green)
@@ -130,7 +130,8 @@ struct ClientDetailView: View {
             }
             Section {
                 ConfirmedToggle(title: "Zablokuj klienta", isOn: vm.isBlocked(current), confirmation: .whenTurningOn,
-                                message: "Zablokowany klient nie będzie obsługiwany przez serwer DNS.") {
+                                message: "Zablokowany klient nie będzie obsługiwany przez serwer DNS.",
+                                alertTitle: "Zablokować klienta?", confirmLabel: "Zablokuj") {
                     await vm.setBlocked(ids: current.ids ?? [], blocked: $0, label: current.name)
                 }
             } footer: { Text("Dodaje identyfikatory klienta do listy zablokowanych klientów (kontrola dostępu).") }

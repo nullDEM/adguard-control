@@ -41,7 +41,7 @@ final class AppState: ObservableObject {
         self.profiles = loaded
         let saved = profileStore.activeProfileID
         self.activeProfileID = loaded.contains { $0.id == saved } ? saved : loaded.first?.id
-        (passwords as? KeychainStore)?.migrateToSharedGroup(profileIDs: loaded.map(\.id))
+        passwords.migrateToSharedGroup(profileIDs: loaded.map(\.id))
         if monitorNetwork {
             networkMonitor.start { [weak self] in
                 Task { @MainActor in self?.requestRefresh() }

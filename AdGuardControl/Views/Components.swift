@@ -143,47 +143,59 @@ struct StatTile: View {
 
 // MARK: - Potwierdzenia
 
-/// Przełącznik, który przed zastosowaniem zmiany pyta o potwierdzenie.
 /// Kiedy przełącznik pyta o potwierdzenie. Zgodnie z HIG alerty są zarezerwowane dla rzadkich lub ryzykownych działań;
 /// zwykłe, odwracalne zmiany stosują się od razu (z komunikatem i przyciskiem „Cofnij”).
 enum ToggleConfirmation {
     case none
     case whenTurningOff
     case whenTurningOn
-}
 
-struct ConfirmedToggle: View {
-    let title: String
-    let isOn: Bool
-    var confirmation: ToggleConfirmation = .none
-    var message: String = "Ta zmiana zostanie od razu zastosowana na serwerze."
-    let action: (Bool) async -> Void
-
-    @State private var pending = false
-    @State private var showAlert = false
-
-    private func needsConfirmation(_ newValue: Bool) -> Bool {
-        switch confirmation {
+    func requiresConfirmation(settingTo newValue: Bool) -> Bool {
+        switch self {
         case .none: return false
         case .whenTurningOff: return !newValue
         case .whenTurningOn: return newValue
         }
     }
+}
+
+/// Przełącznik zmieniający ustawienie na serwerze. Pokazuje wybraną wartość od razu (do czasu odpowiedzi serwera),
+/// a przy ryzykownej zmianie najpierw pyta o potwierdzenie.
+struct ConfirmedToggle: View {
+    let title: String
+    let isOn: Bool
+    var confirmation: ToggleConfirmation = .none
+    var message: String = "Ta zmiana zostanie od razu zastosowana na serwerze."
+    /// Pytanie w alercie; domyślnie „Włączyć/Wyłączyć: <tytuł>?”.
+    var alertTitle: String?
+    /// Przycisk potwierdzenia; domyślnie „Włącz”/„Wyłącz”.
+    var confirmLabel: String?
+    let action: (Bool) async -> Void
+
+    @State private var pending = false
+    @State private var showAlert = false
+    /// Wartość wybrana przez użytkownika, dopóki serwer nie odpowie. Po błędzie wraca do `isOn`.
+    @State private var optimistic: Bool?
+
+    private func apply(_ value: Bool) {
+        optimistic = value
+        Task {
+            await action(value)
+            optimistic = nil
+        }
+    }
 
     var body: some View {
-        Toggle(title, isOn: Binding(get: { isOn }, set: { newValue in
-            if needsConfirmation(newValue) {
+        Toggle(title, isOn: Binding(get: { optimistic ?? isOn }, set: { newValue in
+            if confirmation.requiresConfirmation(settingTo: newValue) {
                 pending = newValue
                 showAlert = true
             } else {
-                Task { await action(newValue) }
+                apply(newValue)
             }
         }))
-        .alert(pending ? "Włączyć: \(title)?" : "Wyłączyć: \(title)?", isPresented: $showAlert) {
-            Button(pending ? "Włącz" : "Wyłącz", role: pending ? nil : .destructive) {
-                let value = pending
-                Task { await action(value) }
-            }
+        .alert(alertTitle ?? (pending ? "Włączyć: \(title)?" : "Wyłączyć: \(title)?"), isPresented: $showAlert) {
+            Button(confirmLabel ?? (pending ? "Włącz" : "Wyłącz"), role: .destructive) { apply(pending) }
             Button("Anuluj", role: .cancel) {}
         } message: {
             Text(message)

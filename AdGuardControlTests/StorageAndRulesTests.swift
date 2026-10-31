@@ -41,6 +41,41 @@ final class StorageTests: XCTestCase {
         XCTAssertNil(store.password(for: id))
     }
 
+    func testKeychainMigrationKeepsPasswordsAndRunsOnlyOnce() throws {
+        let store = KeychainStore(service: "pl.adguardcontrol.tests.\(UUID().uuidString)")
+        let suite = "pl.adguardcontrol.tests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let id = UUID()
+        try store.setPassword("tajne", for: id)
+
+        store.migrateToSharedGroup(profileIDs: [id], defaults: defaults)
+        XCTAssertEqual(store.password(for: id), "tajne", "migracja nie może zgubić hasła")
+
+        // Po pomyślnej migracji flaga blokuje kolejne przebiegi (nie przepisujemy haseł przy każdym starcie).
+        store.deletePassword(for: id)
+        store.migrateToSharedGroup(profileIDs: [id], defaults: defaults)
+        XCTAssertNil(store.password(for: id))
+        store.deletePassword(for: id)
+    }
+
+    func testInMemoryStoreMigrationIsANoOp() throws {
+        let store = InMemoryPasswordStore()
+        let id = UUID()
+        try store.setPassword("a", for: id)
+        store.migrateToSharedGroup(profileIDs: [id])
+        XCTAssertEqual(store.password(for: id), "a")
+    }
+
+    func testToggleConfirmationOnlyAsksForTheRiskyDirection() {
+        XCTAssertFalse(ToggleConfirmation.none.requiresConfirmation(settingTo: true))
+        XCTAssertFalse(ToggleConfirmation.none.requiresConfirmation(settingTo: false))
+        XCTAssertTrue(ToggleConfirmation.whenTurningOff.requiresConfirmation(settingTo: false))
+        XCTAssertFalse(ToggleConfirmation.whenTurningOff.requiresConfirmation(settingTo: true))
+        XCTAssertTrue(ToggleConfirmation.whenTurningOn.requiresConfirmation(settingTo: true))
+        XCTAssertFalse(ToggleConfirmation.whenTurningOn.requiresConfirmation(settingTo: false))
+    }
+
     @MainActor
     func testAppStateSavesNormalizedProfileAndKeepsPasswordOutOfDefaults() throws {
         let passwords = InMemoryPasswordStore()
