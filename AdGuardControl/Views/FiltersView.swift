@@ -2,7 +2,7 @@ import SwiftUI
 
 struct FiltersView: View {
     enum Tab: String, CaseIterable, Identifiable {
-        case blocklists = "Blokujące", allowlists = "Zezwalające", rules = "Reguły", rewrites = "Przepisywanie"
+        case blocklists = "Blokujące", allowlists = "Zezwalające", rules = "Reguły", rewrites = "Przepisy"
         var id: String { rawValue }
     }
 
