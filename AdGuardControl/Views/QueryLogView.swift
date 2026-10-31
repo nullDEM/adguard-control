@@ -31,9 +31,9 @@ struct QueryLogView: View {
                         }
                         .swipeActions(edge: .trailing) {
                             Button { pendingQuickAction = QuickAction(kind: .block, domain: item.domain) } label: { Label("Blokuj", systemImage: "hand.raised") }
-                                .tint(.red)
+                                .tint(Palette.red)
                             Button { pendingQuickAction = QuickAction(kind: .allow, domain: item.domain) } label: { Label("Zezwól", systemImage: "checkmark.shield") }
-                                .tint(.green)
+                                .tint(Palette.green)
                         }
                         .onAppear {
                             if item.id == vm.items.last?.id { Task { await vm.loadMore() } }
@@ -47,7 +47,7 @@ struct QueryLogView: View {
                 .refreshable { await vm.reload() }
                 .animation(.default, value: vm.visibleItems.count)
             }
-            .navigationTitle("Query Log")
+            .navigationTitle("Dziennik zapytań")
             .searchable(text: $vm.search, prompt: "Domena lub IP klienta")
             .onSubmit(of: .search) { Task { await vm.submitSearch() } }
             .onChange(of: vm.search) { _, _ in vm.searchTextChanged() }
@@ -162,9 +162,9 @@ struct QueryDetailView: View {
             }
             Section("Szybkie akcje") {
                 Button { pending = .block } label: { Label("Zablokuj domenę", systemImage: "hand.raised") }
-                    .tint(.red)
+                    .tint(Palette.red)
                 Button { pending = .allow } label: { Label("Dodaj do białej listy", systemImage: "checkmark.shield") }
-                    .tint(.green)
+                    .tint(Palette.green)
                 Button {
                     customRule = UserRule.blockRule(domain: item.domain)
                     showCustomRule = true

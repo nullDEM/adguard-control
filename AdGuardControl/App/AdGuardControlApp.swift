@@ -24,16 +24,7 @@ struct AdGuardControlApp: App {
 
 struct RootView: View {
     @EnvironmentObject private var app: AppState
-    @AppStorage("appearance") private var appearance = "dark"
     @Environment(\.scenePhase) private var scenePhase
-
-    private var scheme: ColorScheme? {
-        switch appearance {
-        case "light": return .light
-        case "system": return nil
-        default: return .dark
-        }
-    }
 
     var body: some View {
         ZStack {
@@ -47,7 +38,6 @@ struct RootView: View {
             // Podgląd w przełączniku aplikacji nie może pokazywać zapytań DNS ani danych serwera.
             if scenePhase != .active { PrivacyShield() }
         }
-        .preferredColorScheme(scheme)
         .tint(Theme.accent)
         .onOpenURL { url in
             if let link = DeepLink(url: url) { app.open(link) }
@@ -76,9 +66,9 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $app.selectedTab) {
-            DashboardView().tabItem { Label("Dashboard", systemImage: "gauge.with.dots.needle.67percent") }.tag(AppTab.dashboard)
+            DashboardView().tabItem { Label("Przegląd", systemImage: "gauge.with.dots.needle.67percent") }.tag(AppTab.dashboard)
             ProtectionView().tabItem { Label("Ochrona", systemImage: "shield.lefthalf.filled") }.tag(AppTab.protection)
-            QueryLogView().tabItem { Label("Query Log", systemImage: "list.bullet.rectangle") }.tag(AppTab.querylog)
+            QueryLogView().tabItem { Label("Dziennik", systemImage: "list.bullet.rectangle") }.tag(AppTab.querylog)
             FiltersView().tabItem { Label("Filtry", systemImage: "line.3.horizontal.decrease.circle") }.tag(AppTab.filters)
             MoreView().tabItem { Label("Więcej", systemImage: "ellipsis.circle") }.tag(AppTab.more)
         }

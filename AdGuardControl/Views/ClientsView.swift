@@ -35,7 +35,7 @@ struct ClientsView: View {
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) { deleting = client } label: { Label("Usuń", systemImage: "trash") }
                                 Button { editing = ClientEditorTarget(client: client) } label: { Label("Edytuj", systemImage: "pencil") }
-                                    .tint(.blue)
+                                    .tint(Palette.blue)
                             }
                         }
                     }
@@ -68,7 +68,7 @@ struct ClientsView: View {
     private func clientRow(_ client: Client) -> some View {
         HStack {
             Image(systemName: vm.isBlocked(client) ? "person.crop.circle.badge.xmark" : "person.crop.circle")
-                .foregroundStyle(vm.isBlocked(client) ? .red : Theme.accent)
+                .foregroundStyle(vm.isBlocked(client) ? Palette.red : Theme.accent)
                 .font(.title2)
             VStack(alignment: .leading, spacing: 2) {
                 Text(client.name).font(.headline)
@@ -91,7 +91,7 @@ struct ClientsView: View {
                 Text("\(auto.ip)\(auto.source.map { " · \($0)" } ?? "")").font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
-            if vm.isBlocked(ip: auto.ip) { Image(systemName: "nosign").foregroundStyle(.red) }
+            if vm.isBlocked(ip: auto.ip) { Image(systemName: "nosign").foregroundStyle(Palette.red) }
             Text(Formatting.number(vm.queryCounts[auto.ip] ?? 0)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
         }
         .swipeActions(edge: .leading) {
@@ -100,13 +100,13 @@ struct ClientsView: View {
                 client.name = auto.name?.isEmpty == false ? auto.name! : auto.ip
                 client.ids = [auto.ip]
                 editing = ClientEditorTarget(client: nil, prefill: client)
-            } label: { Label("Zapisz", systemImage: "plus") }.tint(.green)
+            } label: { Label("Zapisz", systemImage: "plus") }.tint(Palette.green)
         }
         .swipeActions(edge: .trailing) {
             Button {
                 Task { await vm.setBlocked(ids: [auto.ip], blocked: !vm.isBlocked(ip: auto.ip), label: auto.ip) }
             } label: { Label(vm.isBlocked(ip: auto.ip) ? "Odblokuj" : "Blokuj", systemImage: "nosign") }
-                .tint(vm.isBlocked(ip: auto.ip) ? .green : .red)
+                .tint(vm.isBlocked(ip: auto.ip) ? Palette.green : Palette.red)
         }
     }
 }
@@ -129,7 +129,7 @@ struct ClientDetailView: View {
                 if !(current.upstreams ?? []).isEmpty { LabeledContent("Upstream", value: (current.upstreams ?? []).joined(separator: ", ")) }
             }
             Section {
-                ConfirmedToggle(title: "Zablokuj klienta", isOn: vm.isBlocked(current),
+                ConfirmedToggle(title: "Zablokuj klienta", isOn: vm.isBlocked(current), confirmation: .whenTurningOn,
                                 message: "Zablokowany klient nie będzie obsługiwany przez serwer DNS.") {
                     await vm.setBlocked(ids: current.ids ?? [], blocked: $0, label: current.name)
                 }

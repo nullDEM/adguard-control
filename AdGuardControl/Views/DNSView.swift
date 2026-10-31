@@ -75,10 +75,10 @@ struct DNSView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
                         Image(systemName: entry.result == "OK" ? "checkmark.circle.fill" : "xmark.octagon.fill")
-                            .foregroundStyle(entry.result == "OK" ? .green : .red)
+                            .foregroundStyle(entry.result == "OK" ? Palette.green : Palette.red)
                         Text(entry.server).font(.subheadline)
                     }
-                    if entry.result != "OK" { Text(entry.result).font(.caption).foregroundStyle(.red) }
+                    if entry.result != "OK" { Text(entry.result).font(.caption).foregroundStyle(Palette.red) }
                 }
             }
         } footer: { Text("Test dotyczy wartości z formularza (także niezapisanych).") }

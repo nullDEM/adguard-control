@@ -25,14 +25,14 @@ Pominięte celowo: endpointy oznaczone w specyfikacji jako *deprecated*, kreator
 
 ## Funkcje web UI pokryte przez aplikację
 
-- **Dashboard**: status ochrony, liczniki, wykres aktywności, top domeny / zablokowane / klienci, ostatnie zapytania, pauza ochrony, pull-to-refresh, zakres statystyk.
+- **Przegląd**: status ochrony, liczniki, wykres aktywności, top domeny / zablokowane / klienci, ostatnie zapytania, pauza ochrony, pull-to-refresh, zakres statystyk.
 - **Ochrona**: ochrona DNS, filtrowanie, bezpieczne przeglądanie, kontrola rodzicielska (włącz/wyłącz), bezpieczne wyszukiwanie osobno dla każdej wyszukiwarki, blokowane usługi, sprawdzanie domeny.
-- **Query Log**: doczytywanie (`older_than`), wyszukiwanie, filtr statusu (zablokowane, bezp. przeglądanie, rodzicielska, biała lista, przepisane, safe search, przetworzone), filtr klienta, szczegóły, szybkie akcje (blokuj domenę, zezwól, własna reguła), także gestem przesunięcia.
+- **Dziennik zapytań**: doczytywanie (`older_than`), wyszukiwanie, filtr statusu (zablokowane, bezp. przeglądanie, rodzicielska, biała lista, przepisane, safe search, przetworzone), filtr klienta, szczegóły, szybkie akcje (blokuj domenę, zezwól, własna reguła), także gestem przesunięcia.
 - **Filtry**: listy blokujące i zezwalające (dodawanie, edycja, usuwanie, włączanie, odświeżanie, interwał aktualizacji, liczba reguł i czas aktualizacji), własne reguły (dodawanie, edycja, usuwanie, wyłączanie przez komentarz `!`, edycja tekstowa), DNS rewrites.
 - **Klienci**: trwali i tymczasowi, dodawanie / edycja / usuwanie, tagi, ustawienia filtrowania, safe search, blokowane usługi, dedykowane upstream DNS, prywatność (query log / statystyki), blokowanie i odblokowywanie, liczba zapytań i ostatnie zapytania klienta.
 - **DNS**: upstream, bootstrap, fallback, test upstreamów, tryb zapytań (load balance / równoległe / najszybszy), timeout, DNSSEC, IPv6, cache (rozmiar, TTL, optymistyczny), tryb blokowania, prywatny reverse DNS, EDNS Client Subnet, rate limit, czyszczenie cache.
 - **DHCP**: status, włączanie, interfejs, zakres IPv4, czas dzierżawy, aktywne dzierżawy (z możliwością zamiany na statyczną), statyczne przypisania (CRUD), wykrywanie innych serwerów DHCP, reset.
-- **Ustawienia**: profile serwerów, preset Tailscale, ustawienia ogólne (wersja serwera, aktualizacje, język i motyw panelu, statystyki, query log, czyszczenie statystyk/logu/cache), TLS/HTTPS (status certyfikatu, ostrzeżenia o ważności i łańcuchu, walidacja, konfiguracja), kontrola dostępu (dozwolone/zablokowane klienty, blokowane hosty), motyw aplikacji (domyślnie ciemny / jasny / systemowy).
+- **Ustawienia**: profile serwerów, preset Tailscale, ustawienia ogólne (wersja serwera, aktualizacje, język i motyw panelu, statystyki, query log, czyszczenie statystyk/logu/cache), TLS/HTTPS (status certyfikatu, ostrzeżenia o ważności i łańcuchu, walidacja, konfiguracja), kontrola dostępu (dozwolone/zablokowane klienty, blokowane hosty), aplikacja podąża za wyglądem systemu (jasny / ciemny).
 
 Każda zmiana konfiguracji wymaga potwierdzenia i pokazuje komunikat o wyniku, a większość operacji ma przycisk **Cofnij**. Obsługiwane są stany ładowania, pustych list, błędów i braku uprawnień (401/403).
 

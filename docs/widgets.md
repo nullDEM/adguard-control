@@ -17,7 +17,7 @@ The **AdGuard Home** widget (WidgetKit, iOS 17+) can be added from the home scre
 - Choose the server in the widget configuration ("Edit widget"). Without a choice the widget shows the server that is active in the app.
 - Choose the pause length (5 min, 10 min, 30 min, 1 hour) in the same place.
 - The button works without opening the app (App Intents) and refreshes the widget right away.
-- Tapping the widget opens the app on the Dashboard of that server. Tapping the most-blocked domain (medium widget) opens the Query Log. Links look like `adguardcontrol://open?tab=querylog&profile=<UUID>`; valid tabs are `dashboard`, `protection`, `querylog`, `filters`, `more`. Unknown links are ignored.
+- Tapping the widget opens the app on the Overview tab of that server. Tapping the most-blocked domain (medium widget) opens the Log tab. Links look like `adguardcontrol://open?tab=querylog&profile=<UUID>`; valid tabs are `dashboard`, `protection`, `querylog`, `filters`, `more`. Unknown links are ignored.
 - Data refreshes about every 15 minutes (every 5 minutes after an error). Changing the profile or protection in the app refreshes it immediately. iOS may throttle widget refreshes.
 - Errors (no network, Tailscale off, wrong password) are shown in the widget instead of stale data.
 

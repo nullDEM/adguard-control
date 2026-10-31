@@ -25,14 +25,14 @@ Intentionally skipped: endpoints marked *deprecated* in the specification, the i
 
 ## Web UI features covered
 
-- **Dashboard**: protection status, counters, activity chart, top domains / blocked / clients, recent queries, pausing protection, pull to refresh, statistics range.
+- **Overview**: protection status, counters, activity chart, top domains / blocked / clients, recent queries, pausing protection, pull to refresh, statistics range.
 - **Protection**: DNS protection, filtering, safe browsing, parental control (on/off), safe search per engine, blocked services, host checker.
 - **Query log**: paging (`older_than`), search, status filter (blocked, safe browsing, parental, allowed, rewritten, safe search, processed), client filter, details, quick actions (block domain, allow, custom rule), also by swipe.
 - **Filters**: blocklists and allowlists (add, edit, remove, enable, refresh, update interval, rule counts and update time), custom rules (add, edit, remove, disable via `!` comment, text editing), DNS rewrites.
 - **Clients**: persistent and runtime clients, add / edit / remove, tags, filtering settings, safe search, blocked services, dedicated upstream DNS, privacy (query log / statistics), block and unblock, query counts and recent queries per client.
 - **DNS**: upstreams, bootstrap, fallback, upstream test, query mode (load balance / parallel / fastest), timeout, DNSSEC, IPv6, cache (size, TTL, optimistic), blocking mode, private reverse DNS, EDNS Client Subnet, rate limit, clearing the cache.
 - **DHCP**: status, enable, interface, IPv4 range, lease time, active leases (convertible to static), static leases (CRUD), detecting other DHCP servers, reset.
-- **Settings**: server profiles, Tailscale preset, general settings (server version, updates, panel language and theme, statistics, query log, clearing statistics/log/cache), TLS/HTTPS (certificate status, validity and chain warnings, validation, configuration), access control (allowed/blocked clients, blocked hosts), app theme (dark by default / light / system).
+- **Settings**: server profiles, Tailscale preset, general settings (server version, updates, panel language and theme, statistics, query log, clearing statistics/log/cache), TLS/HTTPS (certificate status, validity and chain warnings, validation, configuration), access control (allowed/blocked clients, blocked hosts), the app follows the system appearance (light / dark).
 
 Every configuration change asks for confirmation and shows a result message, with an **Undo** button for most operations. Loading, empty, error and no-permission (401/403) states are handled.
 

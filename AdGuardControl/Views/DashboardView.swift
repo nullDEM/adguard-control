@@ -6,6 +6,7 @@ struct DashboardView: View {
     @StateObject private var vm = DashboardViewModel()
     @State private var pauseOption: PauseOption?
     @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .title) private var shieldSize: CGFloat = 36
 
     var body: some View {
         NavigationStack {
@@ -16,15 +17,15 @@ struct DashboardView: View {
                         tiles
                         chartCard
                         topList("Najczęstsze domeny", entries: vm.stats?.topQueriedDomains, tint: Theme.accent)
-                        topList("Najczęściej blokowane", entries: vm.stats?.topBlockedDomains, tint: .red)
-                        topList("Najaktywniejsi klienci", entries: vm.stats?.topClients, tint: .purple)
+                        topList("Najczęściej blokowane", entries: vm.stats?.topBlockedDomains, tint: Palette.red)
+                        topList("Najaktywniejsi klienci", entries: vm.stats?.topClients, tint: Theme.accent)
                         recentCard
                     }
                     .padding()
                 }
                 .refreshable { await vm.refresh() }
             }
-            .navigationTitle("Dashboard")
+            .navigationTitle("Przegląd")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { ProfileMenu() }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -50,7 +51,7 @@ struct DashboardView: View {
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 14) {
                 Image(systemName: protectionEnabled ? "shield.checkered" : "shield.slash")
-                    .font(.system(size: 36)).foregroundStyle(tint)
+                    .font(.system(size: shieldSize)).foregroundStyle(tint)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(protectionEnabled ? "Ochrona włączona" : "Ochrona wyłączona")
                         .font(.title3.bold()).foregroundStyle(tint)
@@ -64,7 +65,7 @@ struct DashboardView: View {
                 }
                 Spacer()
             }
-            ConfirmedToggle(title: "Ochrona DNS", isOn: protectionEnabled,
+            ConfirmedToggle(title: "Ochrona DNS", isOn: protectionEnabled, confirmation: .whenTurningOff,
                             message: "Wyłączenie ochrony zatrzyma blokowanie zapytań DNS dla wszystkich klientów.") { value in
                 await vm.setProtection(enabled: value)
             }
@@ -83,29 +84,38 @@ struct DashboardView: View {
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(tint.opacity(0.5), lineWidth: 1))
     }
 
+    /// Przy największych rozmiarach tekstu kontrolka segmentowa się nie skaluje – wtedy używamy menu.
+    @ViewBuilder private var rangePicker: some View {
+        let picker = Picker("Zakres", selection: $vm.range) {
+            ForEach(vm.availableRanges) { Text($0.title).tag($0) }
+        }
+        if typeSize.isAccessibilitySize {
+            picker.pickerStyle(.menu)
+        } else {
+            picker.pickerStyle(.segmented)
+        }
+    }
+
     private var tiles: some View {
         let stats = vm.stats
         return VStack(spacing: 12) {
-            Picker("Zakres", selection: $vm.range) {
-                ForEach(vm.availableRanges) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: vm.range) { _, _ in Task { await vm.refresh() } }
+            rangePicker
+                .onChange(of: vm.range) { _, _ in Task { await vm.refresh() } }
 
             LazyVGrid(columns: typeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
                 StatTile(title: "Zapytania DNS", value: Formatting.number(stats?.totalQueries ?? 0),
                          icon: "arrow.left.arrow.right", tint: Theme.accent)
                 StatTile(title: "Zablokowane", value: Formatting.number(stats?.totalBlocked ?? 0),
-                         icon: "hand.raised.fill", tint: .red)
-                StatTile(title: "% blokowania", value: Formatting.percent(stats?.blockedPercent ?? 0),
-                         icon: "percent", tint: .orange)
+                         icon: "hand.raised.fill", tint: Palette.red)
+                StatTile(title: "Odsetek zablokowanych", value: Formatting.percent(stats?.blockedPercent ?? 0),
+                         icon: "percent", tint: Palette.red)
                 StatTile(title: "Aktywni klienci", value: Formatting.number(stats?.activeClients ?? 0),
-                         icon: "person.2.fill", tint: .purple)
+                         icon: "person.2.fill", tint: Theme.accent)
                 StatTile(title: "Śr. czas odpowiedzi", value: Formatting.milliseconds(seconds: stats?.avgProcessingTime ?? 0),
-                         icon: "speedometer", tint: .green)
-                StatTile(title: "Bezp. przeglądanie / rodzic.",
+                         icon: "speedometer", tint: Theme.accent)
+                StatTile(title: "Bezpieczne przeglądanie i rodzicielska",
                          value: Formatting.number((stats?.numReplacedSafebrowsing ?? 0) + (stats?.numReplacedParental ?? 0)),
-                         icon: "lock.shield", tint: .blue)
+                         icon: "lock.shield", tint: Palette.red)
             }
         }
     }
@@ -142,7 +152,7 @@ struct DashboardView: View {
                         .opacity(0.12)
                         .interpolationMethod(.monotone)
                 }
-                .chartForegroundStyleScale(["Wszystkie": Theme.accent, "Zablokowane": Color.red])
+                .chartForegroundStyleScale(["Wszystkie": Theme.accent, "Zablokowane": Palette.red])
                 .frame(height: 180)
                 .accessibilityLabel("Wykres aktywności DNS")
             }

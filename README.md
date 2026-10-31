@@ -19,9 +19,9 @@ The API client is written against the official AdGuard Home OpenAPI specificatio
 
 ## Features
 
-- **Dashboard**: protection status, counters (queries, blocked, block rate, clients, response time), activity chart, top domains / blocked domains / clients, pausing protection for 1 min / 10 min / 1 h / 24 h.
+- **Overview** (Dashboard): protection status, counters (queries, blocked, block rate, clients, response time), activity chart, top domains / blocked domains / clients, pausing protection for 1 min / 10 min / 1 h / 24 h.
 - **Protection**: DNS protection, filtering, safe browsing, parental control (on/off), safe search per search engine, blocked services, host checker.
-- **Query log**: infinite scroll, debounced search, status filters, client filter, details, and quick actions (block / allow / custom rule), also by swipe.
+- **Log** (query log): infinite scroll, debounced search, status filters, client filter, details, and quick actions (block / allow / custom rule), also by swipe.
 - **Filters**: blocklists and allowlists (add, edit, remove, enable, refresh, update interval), custom rules, DNS rewrites.
 - **Clients, DNS, DHCP, TLS, access control, general settings** (statistics and query log retention, clearing statistics/log/cache, server updates).
 - **Multiple servers** with a quick switcher; every profile has its own address, login, "Require Tailscale" option and Keychain-stored password.

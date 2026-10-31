@@ -16,7 +16,7 @@ final class AdGuardControlUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Ochrona włączona"].waitForExistence(timeout: 10))
 
         app.switches["Ochrona DNS"].tap()
-        let confirm = app.alerts.buttons["Zastosuj"]
+        let confirm = app.alerts.buttons["Wyłącz"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 5), "wyłączenie ochrony musi wymagać potwierdzenia")
         confirm.tap()
 
@@ -34,7 +34,7 @@ final class AdGuardControlUITests: XCTestCase {
 
     func testQueryLogListsAndSearchesDomains() {
         let app = launch()
-        app.tabBars.buttons["Query Log"].tap()
+        app.tabBars.buttons["Dziennik"].tap()
         XCTAssertTrue(app.staticTexts["ads.tracker.net"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["example.com"].exists)
 
@@ -48,7 +48,7 @@ final class AdGuardControlUITests: XCTestCase {
 
     func testTabsAreReachable() {
         let app = launch()
-        for tab in ["Ochrona", "Filtry", "Więcej", "Dashboard"] {
+        for tab in ["Ochrona", "Filtry", "Więcej", "Przegląd"] {
             app.tabBars.buttons[tab].tap()
             XCTAssertTrue(app.tabBars.buttons[tab].isSelected, "zakładka \(tab)")
         }

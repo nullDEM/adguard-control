@@ -19,9 +19,9 @@ Klient API powstał na podstawie oficjalnej specyfikacji OpenAPI AdGuard Home (A
 
 ## Funkcje
 
-- **Dashboard**: stan ochrony, liczniki (zapytania, zablokowane, % blokowania, klienci, czas odpowiedzi), wykres aktywności, top domeny / zablokowane / klienci, pauza ochrony na 1 min / 10 min / 1 h / 24 h.
+- **Przegląd**: stan ochrony, liczniki (zapytania, zablokowane, % blokowania, klienci, czas odpowiedzi), wykres aktywności, top domeny / zablokowane / klienci, pauza ochrony na 1 min / 10 min / 1 h / 24 h.
 - **Ochrona**: ochrona DNS, filtrowanie, bezpieczne przeglądanie, kontrola rodzicielska (włącz/wyłącz), bezpieczne wyszukiwanie osobno dla każdej wyszukiwarki, blokowane usługi, sprawdzanie domeny.
-- **Query Log**: doczytywanie, wyszukiwanie z opóźnieniem (debounce), filtry statusu i klienta, szczegóły oraz szybkie akcje (blokuj / zezwól / własna reguła), także gestem przesunięcia.
+- **Dziennik zapytań**: doczytywanie, wyszukiwanie z opóźnieniem (debounce), filtry statusu i klienta, szczegóły oraz szybkie akcje (blokuj / zezwól / własna reguła), także gestem przesunięcia.
 - **Filtry**: listy blokujące i zezwalające (dodawanie, edycja, usuwanie, włączanie, odświeżanie, interwał aktualizacji), własne reguły, DNS rewrites.
 - **Klienci, DNS, DHCP, TLS, kontrola dostępu, ustawienia ogólne** (retencja statystyk i query logu, czyszczenie statystyk/logu/cache, aktualizacje serwera).
 - **Wiele serwerów** z szybkim przełącznikiem; każdy profil ma własny adres, login, opcję „Wymagaj Tailscale” i hasło w Keychain.

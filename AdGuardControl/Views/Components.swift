@@ -3,16 +3,16 @@ import SwiftUI
 // MARK: - Motyw
 
 enum Theme {
-    static let protectionOn = Color.green
-    static let protectionOff = Color.red
-    static let accent = Color.cyan
+    static let protectionOn = Palette.green
+    static let protectionOff = Palette.red
+    static let accent = Palette.accent
 
     static func tint(for kind: QueryKind) -> Color {
         switch kind {
-        case .blocked, .safeBrowsing, .parental, .blockedService: return .red
-        case .whitelisted: return .green
-        case .rewritten, .safeSearch: return .blue
-        case .error: return .orange
+        case .blocked, .safeBrowsing, .parental, .blockedService: return Palette.red
+        case .whitelisted: return Palette.green
+        case .rewritten, .safeSearch: return Palette.blue
+        case .error: return Palette.orange
         case .allowed: return .secondary
         }
     }
@@ -44,13 +44,14 @@ struct LoadStateView<Content: View>: View {
 struct ErrorStateView: View {
     let error: APIError
     let retry: () async -> Void
+    @ScaledMetric(relativeTo: .title) private var iconSize: CGFloat = 44
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
                 Image(systemName: error.symbol)
-                    .font(.system(size: 44))
-                    .foregroundStyle(error.isAuthorizationProblem || error == .tailscaleRequired ? .orange : .red)
+                    .font(.system(size: iconSize))
+                    .foregroundStyle(error.isAuthorizationProblem || error == .tailscaleRequired ? Palette.orange : Palette.red)
                     .accessibilityHidden(true)
                 Text(error.title)
                     .font(.title3.bold())
@@ -73,6 +74,7 @@ struct ErrorStateView: View {
                     Task { await retry() }
                 } label: {
                     Label("Spróbuj ponownie", systemImage: "arrow.clockwise")
+                        .foregroundStyle(Palette.onAccent)
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -85,10 +87,11 @@ struct EmptyStateView: View {
     let icon: String
     let title: String
     var message: String?
+    @ScaledMetric(relativeTo: .title) private var iconSize: CGFloat = 38
 
     var body: some View {
         VStack(spacing: 10) {
-            Image(systemName: icon).font(.system(size: 38)).foregroundStyle(.secondary)
+            Image(systemName: icon).font(.system(size: iconSize)).foregroundStyle(.secondary)
             Text(title).font(.headline)
             if let message {
                 Text(message).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
@@ -141,22 +144,43 @@ struct StatTile: View {
 // MARK: - Potwierdzenia
 
 /// Przełącznik, który przed zastosowaniem zmiany pyta o potwierdzenie.
+/// Kiedy przełącznik pyta o potwierdzenie. Zgodnie z HIG alerty są zarezerwowane dla rzadkich lub ryzykownych działań;
+/// zwykłe, odwracalne zmiany stosują się od razu (z komunikatem i przyciskiem „Cofnij”).
+enum ToggleConfirmation {
+    case none
+    case whenTurningOff
+    case whenTurningOn
+}
+
 struct ConfirmedToggle: View {
     let title: String
     let isOn: Bool
+    var confirmation: ToggleConfirmation = .none
     var message: String = "Ta zmiana zostanie od razu zastosowana na serwerze."
     let action: (Bool) async -> Void
 
     @State private var pending = false
     @State private var showAlert = false
 
+    private func needsConfirmation(_ newValue: Bool) -> Bool {
+        switch confirmation {
+        case .none: return false
+        case .whenTurningOff: return !newValue
+        case .whenTurningOn: return newValue
+        }
+    }
+
     var body: some View {
         Toggle(title, isOn: Binding(get: { isOn }, set: { newValue in
-            pending = newValue
-            showAlert = true
+            if needsConfirmation(newValue) {
+                pending = newValue
+                showAlert = true
+            } else {
+                Task { await action(newValue) }
+            }
         }))
         .alert(pending ? "Włączyć: \(title)?" : "Wyłączyć: \(title)?", isPresented: $showAlert) {
-            Button("Zastosuj") {
+            Button(pending ? "Włącz" : "Wyłącz", role: pending ? nil : .destructive) {
                 let value = pending
                 Task { await action(value) }
             }
@@ -193,7 +217,7 @@ struct ToastOverlay: View {
             if let toast = app.toast {
                 HStack(spacing: 12) {
                     Image(systemName: toast.style == .success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                        .foregroundStyle(toast.style == .success ? .green : .orange)
+                        .foregroundStyle(toast.style == .success ? Palette.green : Palette.orange)
                     Text(toast.text).font(.subheadline).lineLimit(3)
                     Spacer(minLength: 4)
                     if let undo = toast.undo {

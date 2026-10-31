@@ -2,7 +2,7 @@ import SwiftUI
 
 struct FiltersView: View {
     enum Tab: String, CaseIterable, Identifiable {
-        case blocklists = "Blokujące", allowlists = "Zezwalające", rules = "Reguły", rewrites = "Rewrites"
+        case blocklists = "Blokujące", allowlists = "Zezwalające", rules = "Reguły", rewrites = "Przepisywanie"
         var id: String { rawValue }
     }
 
@@ -72,7 +72,7 @@ struct FiltersView: View {
     private func filterList(_ filters: [Filter], whitelist: Bool) -> some View {
         Section {
             if !whitelist {
-                ConfirmedToggle(title: "Filtrowanie włączone", isOn: vm.status?.enabled ?? false) { await vm.setFilteringEnabled($0) }
+                ConfirmedToggle(title: "Filtrowanie włączone", isOn: vm.status?.enabled ?? false, confirmation: .whenTurningOff) { await vm.setFilteringEnabled($0) }
                 Picker("Aktualizuj co", selection: Binding(get: { vm.status?.interval ?? 24 }, set: { pendingInterval = $0 })) {
                     Text("Nigdy").tag(0)
                     Text("1 godz.").tag(1)
@@ -159,7 +159,7 @@ private struct FilterRow: View {
         }
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) { confirmDelete = true } label: { Label("Usuń", systemImage: "trash") }
-            Button(action: edit) { Label("Edytuj", systemImage: "pencil") }.tint(.blue)
+            Button(action: edit) { Label("Edytuj", systemImage: "pencil") }.tint(Palette.blue)
         }
         .confirm("Usunąć listę „\(filter.name)”?", isPresented: $confirmDelete,
                  message: "Lista zostanie usunięta z AdGuard Home.", actionTitle: "Usuń", destructive: true) {
@@ -177,10 +177,10 @@ private struct RuleRow: View {
 
     private var icon: (String, Color) {
         switch rule.kind {
-        case .block: return ("hand.raised.fill", .red)
-        case .allow: return ("checkmark.shield.fill", .green)
+        case .block: return ("hand.raised.fill", Palette.red)
+        case .allow: return ("checkmark.shield.fill", Palette.green)
         case .comment: return ("text.quote", .secondary)
-        case .disabled: return ("pause.circle", .orange)
+        case .disabled: return ("pause.circle", Palette.orange)
         case .other: return ("questionmark.circle", .secondary)
         }
     }
@@ -200,7 +200,7 @@ private struct RuleRow: View {
             if rule.kind != .comment {
                 Button { confirmToggle = true } label: {
                     Label(rule.isEnabled ? "Wyłącz" : "Włącz", systemImage: rule.isEnabled ? "pause" : "play")
-                }.tint(.orange)
+                }.tint(Palette.orange)
             }
         }
         .confirm("Usunąć regułę?", isPresented: $confirmDelete, message: rule.text, actionTitle: "Usuń", destructive: true) {
@@ -227,7 +227,7 @@ private struct RewriteRow: View {
         }
         .swipeActions(edge: .trailing) {
             Button(role: .destructive) { confirmDelete = true } label: { Label("Usuń", systemImage: "trash") }
-            Button(action: edit) { Label("Edytuj", systemImage: "pencil") }.tint(.blue)
+            Button(action: edit) { Label("Edytuj", systemImage: "pencil") }.tint(Palette.blue)
         }
         .confirm("Usunąć przepisanie \(entry.domain)?", isPresented: $confirmDelete, actionTitle: "Usuń", destructive: true) {
             Task { await vm.deleteRewrite(entry) }

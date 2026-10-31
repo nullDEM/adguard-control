@@ -53,7 +53,7 @@ struct DHCPView: View {
     private var content: some View {
         List {
             Section {
-                ConfirmedToggle(title: "Serwer DHCP", isOn: vm.status?.enabled ?? false,
+                ConfirmedToggle(title: "Serwer DHCP", isOn: vm.status?.enabled ?? false, confirmation: .whenTurningOff,
                                 message: "Włączenie DHCP, gdy w sieci działa inny serwer DHCP, spowoduje konflikty adresów.") {
                     await vm.setEnabled($0)
                 }
@@ -98,7 +98,7 @@ struct DHCPView: View {
                     }
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) { deleting = lease } label: { Label("Usuń", systemImage: "trash") }
-                        Button { editingStatic = StaticLeaseTarget(lease: lease) } label: { Label("Edytuj", systemImage: "pencil") }.tint(.blue)
+                        Button { editingStatic = StaticLeaseTarget(lease: lease) } label: { Label("Edytuj", systemImage: "pencil") }.tint(Palette.blue)
                     }
                 }
                 Button { editingStatic = StaticLeaseTarget(lease: nil) } label: { Label("Dodaj przypisanie", systemImage: "plus") }
@@ -113,7 +113,7 @@ struct DHCPView: View {
                         Text("Wygasa: \(Formatting.shortDateTime(lease.expires))").font(.caption2).foregroundStyle(.secondary)
                     }
                     .swipeActions(edge: .leading) {
-                        Button { makingStatic = lease } label: { Label("Statyczny", systemImage: "pin") }.tint(.green)
+                        Button { makingStatic = lease } label: { Label("Statyczny", systemImage: "pin") }.tint(Palette.green)
                     }
                 }
             }
@@ -142,7 +142,7 @@ struct DHCPView: View {
                 .textInputAutocapitalization(.never).autocorrectionDisabled()
                 .keyboardType(.numbersAndPunctuation)
                 .multilineTextAlignment(.trailing).frame(maxWidth: 180)
-                .foregroundStyle(addressIsValid(vm.draft.v4?[keyPath: keyPath] ?? "") ? Color.primary : Color.red)
+                .foregroundStyle(addressIsValid(vm.draft.v4?[keyPath: keyPath] ?? "") ? Color.primary : Palette.red)
         }
         .accessibilityElement(children: .combine)
     }
@@ -161,13 +161,13 @@ struct DHCPView: View {
         let v6 = result.v6?.otherServer?.found ?? "no"
         Label("Inny serwer DHCP IPv4: \(v4 == "yes" ? "wykryty" : v4 == "error" ? "błąd" : "nie wykryto")",
               systemImage: v4 == "yes" ? "exclamationmark.triangle.fill" : "checkmark.circle")
-            .foregroundStyle(v4 == "yes" ? .orange : .secondary).font(.footnote)
+            .foregroundStyle(v4 == "yes" ? Palette.orange : .secondary).font(.footnote)
         Label("Inny serwer DHCP IPv6: \(v6 == "yes" ? "wykryty" : v6 == "error" ? "błąd" : "nie wykryto")",
               systemImage: v6 == "yes" ? "exclamationmark.triangle.fill" : "checkmark.circle")
-            .foregroundStyle(v6 == "yes" ? .orange : .secondary).font(.footnote)
+            .foregroundStyle(v6 == "yes" ? Palette.orange : .secondary).font(.footnote)
         if result.v4?.staticIp?.static == "no", let ip = result.v4?.staticIp?.ip, !ip.isEmpty {
             Label("Interfejs ma dynamiczny adres IP (\(ip)). Ustaw statyczny przed włączeniem DHCP.", systemImage: "exclamationmark.triangle")
-                .foregroundStyle(.orange).font(.footnote)
+                .foregroundStyle(Palette.orange).font(.footnote)
         }
     }
 }

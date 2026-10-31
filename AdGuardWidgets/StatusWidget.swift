@@ -37,7 +37,7 @@ struct StatusProvider: AppIntentTimelineProvider {
 struct AdGuardStatusWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: "AdGuardStatus", intent: SelectServerIntent.self, provider: StatusProvider()) { entry in
-            StatusWidgetView(snapshot: entry.snapshot, pause: entry.pause)
+            StatusWidgetView(snapshot: entry.snapshot, pause: entry.pause, updated: entry.date)
         }
         .configurationDisplayName("AdGuard Home")
         .description("Stan ochrony DNS i statystyki. Przycisk włącza lub wstrzymuje ochronę.")
@@ -48,10 +48,10 @@ struct AdGuardStatusWidget: Widget {
 // MARK: - Widoki
 
 private enum WidgetTheme {
-    static let accent = Color.cyan
-    static let blocked = Color(red: 1, green: 0.35, blue: 0.35)
-    static let background = LinearGradient(colors: [Color(red: 0.05, green: 0.09, blue: 0.14), .black],
-                                           startPoint: .top, endPoint: .bottom)
+    static let accent = Palette.accent
+    static let blocked = Palette.red
+    /// Tekst na przycisku z wypełnieniem: biały w jasnym, czarny w ciemnym motywie (kontrast ≥ 4,5:1).
+    static let onTint = Color(UIColor { $0.userInterfaceStyle == .dark ? .black : .white })
 }
 
 extension WidgetSnapshot {
@@ -65,8 +65,8 @@ extension WidgetSnapshot {
         return protectionEnabled ? "checkmark.shield.fill" : "shield.slash.fill"
     }
     var stateColor: Color {
-        if failure != nil { return .orange }
-        return protectionEnabled ? .green : .red
+        if failure != nil { return Palette.orange }
+        return protectionEnabled ? Palette.green : Palette.red
     }
     var percentText: String { String(format: "%.0f%%", blockedPercent) }
     var queriesText: String { WidgetSnapshot.compact(totalQueries) }
@@ -81,6 +81,7 @@ struct StatusWidgetView: View {
     @Environment(\.widgetFamily) private var family
     let snapshot: WidgetSnapshot
     var pause: PauseOption = .ten
+    var updated: Date = .now
 
     private func link(_ tab: AppTab) -> URL { DeepLink(tab: tab, profileID: snapshot.profileID).url }
 
@@ -98,11 +99,14 @@ struct StatusWidgetView: View {
         let enable = !snapshot.protectionEnabled
         return Button(intent: ToggleProtectionIntent(profileID: snapshot.profileID, enable: enable, pause: pause)) {
             Label(enable ? "Włącz" : "Pauza \(pause.label)", systemImage: enable ? "play.fill" : "pause.fill")
-                .font(.caption.weight(.semibold))
-                .frame(maxWidth: .infinity)
+                .font(.footnote.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .foregroundStyle(WidgetTheme.onTint)
+                .frame(maxWidth: .infinity, minHeight: 28)
         }
         .buttonStyle(.borderedProminent)
-        .tint(enable ? .green : WidgetTheme.accent)
+        .tint(enable ? Palette.green : WidgetTheme.accent)
         .disabled(snapshot.failure != nil)
         .accessibilityLabel(enable ? "Włącz ochronę DNS" : "Wstrzymaj ochronę DNS na \(pause.label)")
     }
@@ -122,7 +126,6 @@ struct StatusWidgetView: View {
             }
             if snapshot.failure != .noProfile { toggle }
         }
-        .foregroundStyle(.white)
     }
 
     private var medium: some View {
@@ -133,12 +136,13 @@ struct StatusWidgetView: View {
                     Text(snapshot.profileName).font(.subheadline.weight(.semibold)).lineLimit(1)
                 }
                 Text(snapshot.stateTitle).font(.footnote).foregroundStyle(.secondary)
+                Text("Stan z \(updated.formatted(date: .omitted, time: .shortened))").font(.caption2).foregroundStyle(.secondary)
                 Spacer(minLength: 0)
                 if snapshot.failure != .noProfile { toggle }
             }
             if snapshot.failure == nil {
                 VStack(alignment: .leading, spacing: 8) {
-                    stat("Zapytania (24 h)", snapshot.queriesText, .white)
+                    stat("Zapytania (24 h)", snapshot.queriesText, .primary)
                     stat("Zablokowane", "\(snapshot.blockedText) · \(snapshot.percentText)", WidgetTheme.blocked)
                     if let top = snapshot.topBlocked {
                         Link(destination: link(.querylog)) { stat("Najczęściej blokowana", top, .secondary) }
@@ -147,7 +151,6 @@ struct StatusWidgetView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .foregroundStyle(.white)
     }
 
     private func stat(_ title: String, _ value: String, _ color: some ShapeStyle) -> some View {
@@ -204,7 +207,7 @@ struct StatusWidgetView: View {
 
 private extension View {
     func widgetBackground() -> some View {
-        containerBackground(for: .widget) { WidgetTheme.background }
+        containerBackground(.fill.tertiary, for: .widget)
     }
 }
 

@@ -25,11 +25,11 @@ struct ProtectionView: View {
 
     private var globalSection: some View {
         Section {
-            ConfirmedToggle(title: "Ochrona DNS", isOn: vm.status?.protectionEnabled ?? false,
+            ConfirmedToggle(title: "Ochrona DNS", isOn: vm.status?.protectionEnabled ?? false, confirmation: .whenTurningOff,
                             message: "Wyłączenie ochrony zatrzyma filtrowanie dla wszystkich klientów.") {
                 await vm.setProtection(enabled: $0)
             }
-            ConfirmedToggle(title: "Filtrowanie (listy i reguły)", isOn: vm.filtering?.enabled ?? false) {
+            ConfirmedToggle(title: "Filtrowanie (listy i reguły)", isOn: vm.filtering?.enabled ?? false, confirmation: .whenTurningOff) {
                 await vm.setFiltering(enabled: $0)
             }
             ConfirmedToggle(title: "Bezpieczne przeglądanie", isOn: vm.safeBrowsing) { await vm.setSafeBrowsing($0) }
@@ -100,7 +100,7 @@ struct ProtectionView: View {
                 if let cname = result.cname { LabeledContent("CNAME", value: cname) }
                 if let ips = result.ipAddrs, !ips.isEmpty { LabeledContent("IP", value: ips.joined(separator: ", ")) }
             }
-            if let error = vm.checkError { Text(error).foregroundStyle(.red).font(.footnote) }
+            if let error = vm.checkError { Text(error).foregroundStyle(Palette.red).font(.footnote) }
         } header: { Text("Sprawdź domenę") }
     }
 }

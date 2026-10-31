@@ -29,7 +29,7 @@ struct ProfilesView: View {
                     .buttonStyle(.plain)
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) { deleting = profile } label: { Label("Usuń", systemImage: "trash") }
-                        Button { editing = ProfileEditorTarget(profile: profile) } label: { Label("Edytuj", systemImage: "pencil") }.tint(.blue)
+                        Button { editing = ProfileEditorTarget(profile: profile) } label: { Label("Edytuj", systemImage: "pencil") }.tint(Palette.blue)
                     }
                 }
                 Button { editing = ProfileEditorTarget(profile: nil) } label: {
@@ -146,10 +146,10 @@ struct ProfileEditorView: View {
                     .onSubmit { focus = .username }
                 if let addressError {
                     Label(addressError, systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote).foregroundStyle(.red)
+                        .font(.footnote).foregroundStyle(Palette.red)
                 } else if let transportWarning {
                     Label(transportWarning, systemImage: "info.circle")
-                        .font(.footnote).foregroundStyle(.orange)
+                        .font(.footnote).foregroundStyle(Palette.orange)
                 }
                 if preset != .custom {
                     Text("Zamień szablon na prawdziwy adres. Adres IP znajdziesz w panelu Tailscale lub poleceniem `tailscale ip -4` na Raspberry Pi.")
@@ -167,7 +167,7 @@ struct ProfileEditorView: View {
                     .onSubmit { focus = .password }
                 if let usernameError {
                     Label(usernameError, systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote).foregroundStyle(.red)
+                        .font(.footnote).foregroundStyle(Palette.red)
                 }
                 SecureField("Hasło", text: $password)
                     .focused($focus, equals: .password)
@@ -179,7 +179,7 @@ struct ProfileEditorView: View {
                 Toggle("Wymagaj Tailscale", isOn: $requireTailscale)
                 HStack {
                     Image(systemName: tailscaleActive ? "checkmark.circle.fill" : "xmark.circle")
-                        .foregroundStyle(tailscaleActive ? .green : .secondary)
+                        .foregroundStyle(tailscaleActive ? Palette.green : .secondary)
                     Text(tailscaleActive ? "Tailscale na iPhonie jest aktywny" : "Nie wykryto aktywnego Tailscale na iPhonie")
                         .font(.footnote)
                 }
@@ -231,10 +231,10 @@ struct ProfileEditorView: View {
         switch testOutcome {
         case .success(let status):
             Label("Połączono · AdGuard Home \(status.version)", systemImage: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+                .foregroundStyle(Palette.green)
         case .failure(let error):
             VStack(alignment: .leading, spacing: 6) {
-                Label(error.errorDescription ?? "Błąd", systemImage: "xmark.octagon.fill").foregroundStyle(.red)
+                Label(error.errorDescription ?? "Błąd", systemImage: "xmark.octagon.fill").foregroundStyle(Palette.red)
                 ForEach(error.diagnostics, id: \.self) { Text("• \($0)").font(.footnote).foregroundStyle(.secondary) }
             }
         case nil:
@@ -358,11 +358,16 @@ struct ProfileMenu: View {
             Button { editing = ProfileEditorTarget(profile: nil) } label: { Label("Dodaj serwer…", systemImage: "plus") }
             Button { showManage = true } label: { Label("Zarządzaj serwerami…", systemImage: "list.bullet") }
         } label: {
-            Label(app.activeProfile?.name ?? "Serwer", systemImage: "server.rack")
-                .labelStyle(.titleAndIcon)
-                .font(.footnote)
+            HStack(spacing: 6) {
+                Image(systemName: "server.rack")
+                Text(app.activeProfile?.name ?? "Serwer")
+                    .font(.footnote.weight(.semibold))
+                    .lineLimit(1)
+                    .frame(maxWidth: 140, alignment: .leading)
+            }
         }
-        .accessibilityLabel("Serwery")
+        .accessibilityLabel("Serwer: \(app.activeProfile?.name ?? "brak")")
+        .accessibilityHint("Zmień lub dodaj serwer")
         .sheet(item: $editing) { target in
             NavigationStack { ProfileEditorView(profile: target.profile, isOnboarding: false) }
         }

@@ -17,7 +17,7 @@ Widget **AdGuard Home** (WidgetKit, iOS 17+) dodasz z ekranu głównego (przytrz
 - Serwer wybierasz w konfiguracji widgetu („Edytuj widżet”). Bez wyboru widget pokazuje serwer aktywny w aplikacji.
 - Czas pauzy (5 min, 10 min, 30 min, 1 godz.) wybierasz w tym samym miejscu.
 - Przycisk działa bez otwierania aplikacji (App Intents) i od razu odświeża widget.
-- Dotknięcie widgetu otwiera aplikację na Dashboardzie tego serwera, a dotknięcie najczęściej blokowanej domeny (widget średni) otwiera Query Log. Adresy mają postać `adguardcontrol://open?tab=querylog&profile=<UUID>`; poprawne zakładki to `dashboard`, `protection`, `querylog`, `filters`, `more`. Nieznane adresy są ignorowane.
+- Dotknięcie widgetu otwiera aplikację na zakładce Przegląd tego serwera, a dotknięcie najczęściej blokowanej domeny (widget średni) otwiera Dziennik. Adresy mają postać `adguardcontrol://open?tab=querylog&profile=<UUID>`; poprawne zakładki to `dashboard`, `protection`, `querylog`, `filters`, `more`. Nieznane adresy są ignorowane.
 - Dane odświeżają się co ok. 15 minut (po błędzie co 5 minut). Zmiana profilu lub ochrony w aplikacji odświeża je natychmiast. iOS może ograniczać częstotliwość odświeżeń widgetów.
 - Błędy (brak sieci, Tailscale wyłączony, błędne hasło) są pokazywane w widgecie zamiast starych danych.
 

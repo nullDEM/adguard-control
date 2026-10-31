@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var app: AppState
-    @AppStorage("appearance") private var appearance = "dark"
 
     var body: some View {
         Group {
@@ -24,13 +23,6 @@ struct SettingsView: View {
                     NavigationLink { GeneralSettingsView() } label: { Label("Ustawienia ogólne", systemImage: "gearshape") }
                     NavigationLink { TLSView() } label: { Label("HTTPS / TLS", systemImage: "lock.shield") }
                     NavigationLink { AccessView() } label: { Label("Kontrola dostępu", systemImage: "person.badge.shield.checkmark") }
-                }
-                Section("Wygląd aplikacji") {
-                    Picker("Motyw", selection: $appearance) {
-                        Text("Ciemny").tag("dark")
-                        Text("Jasny").tag("light")
-                        Text("Systemowy").tag("system")
-                    }
                 }
                 Section("Informacje") {
                     NavigationLink { CoverageView() } label: { Label("Zakres funkcji i API", systemImage: "checklist") }
@@ -101,7 +93,7 @@ struct GeneralSettingsView: View {
                                 Button("Zaktualizuj do \(new)", role: .destructive) { confirm = .update }
                             }
                         } else {
-                            Label("Masz najnowszą wersję", systemImage: "checkmark.circle").foregroundStyle(.green).font(.footnote)
+                            Label("Masz najnowszą wersję", systemImage: "checkmark.circle").foregroundStyle(Palette.green).font(.footnote)
                         }
                     }
                 } header: {
@@ -234,7 +226,7 @@ struct TLSView: View {
             Form {
                 if !warnings.isEmpty {
                     Section {
-                        ForEach(warnings, id: \.self) { Label($0, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange).font(.footnote) }
+                        ForEach(warnings, id: \.self) { Label($0, systemImage: "exclamationmark.triangle.fill").foregroundStyle(Palette.orange).font(.footnote) }
                     }
                 }
                 Section("Status certyfikatu") {
@@ -360,7 +352,7 @@ struct CoverageView: View {
     private let covered = [
         "Dashboard: status ochrony, statystyki, wykresy, top domeny/klienci, ostatnie zapytania",
         "Ochrona: pauza, filtrowanie, bezpieczne przeglądanie, rodzicielska (włącz/wyłącz), safe search, blokowane usługi, sprawdzanie domeny",
-        "Query Log: lista, wyszukiwanie, filtr statusu, szczegóły, blokuj/zezwól/własna reguła, doczytywanie",
+        "Dziennik zapytań: lista, wyszukiwanie, filtr statusu, szczegóły, blokuj/zezwól/własna reguła, doczytywanie",
         "Filtry: listy blokujące i zezwalające, własne reguły, DNS rewrites",
         "Klienci: trwali i tymczasowi, edycja, tagi, upstreamy, blokowanie",
         "DNS: upstream/bootstrap/fallback, test, tryby, cache, blokowanie, EDNS, rate limit, prywatny reverse DNS",
@@ -373,7 +365,7 @@ struct CoverageView: View {
         "Ochrona DNS rebinding – brak w API",
         "Zmiana czułości kontroli rodzicielskiej – API tylko odczyt",
         "Dozwolone domeny jako osobna lista – użyj reguł @@||domena^",
-        "Filtr czasu w Query Log – realizowany lokalnie na załadowanych danych",
+        "Filtr czasu w dzienniku zapytań – realizowany lokalnie na załadowanych danych",
         "Harmonogram blokowania usług – zachowywany, ale bez edytora",
         "Kreator pierwszej instalacji, logowanie cookie i profile mobileconfig – poza zakresem"
     ]
